@@ -1,6 +1,8 @@
 package com.example.maxhodik.stock.analyze.dto;
 
+import org.springframework.data.annotation.Id;
+
 import java.math.BigDecimal;
 
-public record StockDto(BigDecimal latestPrice, String companyName) {
+public record StockDto(@Id long id, BigDecimal latestPrice, String companyName, String symbol) {
 }

@@ -9,7 +9,8 @@ import com.example.maxhodik.stock.analyze.repository.CompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.StockRepository;
 import com.example.maxhodik.stock.analyze.restClient.CompanyClient;
 import com.example.maxhodik.stock.analyze.restClient.StockClient;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,7 +22,8 @@ import java.util.concurrent.Executors;
 
 
 @Service
-@AllArgsConstructor
+@Log4j2
+@RequiredArgsConstructor
 public class ProcessingServiceImpl implements ProcessingService {
     private final CompanyClient companyClient;
     private final StockClient stockClient;
@@ -33,7 +35,7 @@ public class ProcessingServiceImpl implements ProcessingService {
 
     public List<Company> getCompanies() {
         return companyClient.getCompanies().stream()
-                .filter(CompanyDto::isEnable)
+                .filter(CompanyDto::isEnabled)
                 .limit(200)
                 .map(companyMapper::convertToCompany)
                 .map(this::addTask)
@@ -54,7 +56,9 @@ public class ProcessingServiceImpl implements ProcessingService {
 
     @Override
     public void saveCompanies(List<Company> companies) {
+        log.info("Start saving companies");
         companyRepository.saveAll(companies);
+        log.info("End saving companies");
     }
 
     @Override

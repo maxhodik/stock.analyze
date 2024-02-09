@@ -1,5 +1,7 @@
 package com.example.maxhodik.stock.analyze.dto;
 
 
-public record CompanyDto(String symbol, String companyName, Boolean isEnable) {
+import org.springframework.data.annotation.Id;
+
+public record CompanyDto(@Id long id, String symbol, String name, Boolean isEnabled) {
 }

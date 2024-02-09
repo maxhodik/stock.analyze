@@ -30,10 +30,10 @@ public class CompanyClientImpl implements CompanyClient {
         ResponseEntity<List<CompanyDto>> response = restTemplate.exchange(url, HttpMethod.GET, null, typeReference);
         if (response.getStatusCode().is2xxSuccessful() & Objects.nonNull(response.getBody())) {
             companies = response.getBody();
-            log.debug("List of companies downloaded successful. Response status {}", response.getStatusCode());
+            log.info("List of companies downloaded successful. Response status {}", response.getStatusCode());
             return companies;
         }
-        log.debug("List of companies isn't downloaded. Response status {}", response.getStatusCode());
+        log.info("List of companies isn't downloaded. Response status {}", response.getStatusCode());
         return List.of();
     }
 }
