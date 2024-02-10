@@ -21,6 +21,7 @@ public class GetDataJob {
     public void runCompanyGetDataJob() {
         List<Company> companies = processingService.getCompanies();
         processingService.saveCompanies(companies);
+        processingService.getCompaniesFromDB();
     }
 
     //    @Scheduled(fixedDelay = 5000, initialDelay = 3000)
@@ -29,5 +30,6 @@ public class GetDataJob {
         processingService.saveStocks(stocks);
 
     }
+
 
 }

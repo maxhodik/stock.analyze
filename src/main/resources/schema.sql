@@ -1,9 +1,9 @@
 -- Database: stocks_analyze
-CREATE DATABASE IF NOT EXISTS stock_analyze;
+--CREATE DATABASE IF NOT EXISTS stock_analyze;
 
 --company
 create TABLE IF NOT EXISTS company (
-    id serial PRIMARY KEY,
+    id serial  PRIMARY KEY,
     symbol VARCHAR(45),
     company_name VARCHAR(45)
     );

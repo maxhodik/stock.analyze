@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     @Column(name = "symbol")
     private String symbol;
     @Column(name = "latest_price")
@@ -23,5 +23,43 @@ public class Stock {
     @Column(name = "company_name")
     private String companyName;
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public BigDecimal getLatestPrice() {
+        return latestPrice;
+    }
+
+    public void setLatestPrice(BigDecimal latestPrice) {
+        this.latestPrice = latestPrice;
+    }
+
+    public BigDecimal getDelta() {
+        return delta;
+    }
+
+    public void setDelta(BigDecimal delta) {
+        this.delta = delta;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
 }

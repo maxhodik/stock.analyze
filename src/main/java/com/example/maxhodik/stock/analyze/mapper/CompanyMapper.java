@@ -9,7 +9,7 @@ public class CompanyMapper {
 
     public Company convertToCompany(CompanyDto companyDto) {
         return Company.builder()
-                .id(companyDto.id())
+                .id((int) companyDto.id())
                 .symbol(companyDto.symbol())
                 .companyName(companyDto.name())
                 .build();

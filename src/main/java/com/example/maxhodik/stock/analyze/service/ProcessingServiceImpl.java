@@ -12,6 +12,7 @@ import com.example.maxhodik.stock.analyze.restClient.StockClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +47,11 @@ public class ProcessingServiceImpl implements ProcessingService {
     public List<Stock> getStock() {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
-        return tasks.stream()
+        List<CompletableFuture<Stock>> completableFutures = tasks.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> stockClient.getStocks(s), executorService))
                 .map(completableFuture -> completableFuture.thenApply(Optional::orElseThrow))
-                .map(cf -> cf.thenApply(stockMapper::convertToStock))
+                .map(cf -> cf.thenApply(stockMapper::convertToStock)).toList();
+        return completableFutures.stream()
                 .map(CompletableFuture::join)
                 .toList();
     }
@@ -64,6 +66,14 @@ public class ProcessingServiceImpl implements ProcessingService {
     @Override
     public void saveStocks(List<Stock> stocks) {
         stockRepository.saveAll(stocks);
+    }
+
+    @Override
+    public Flux<Company> getCompaniesFromDB() {
+        Flux<Company> all = companyRepository.findAll();
+        log.info("Getting list companies");
+        all.subscribe(System.out::println);
+        return all;
     }
 
     private Company addTask(Company company) {

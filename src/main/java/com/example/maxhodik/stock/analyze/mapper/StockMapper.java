@@ -9,11 +9,10 @@ public class StockMapper {
 
     public Stock convertToStock(StockDto stockDto) {
         return Stock.builder()
-                .id(stockDto.id())
+                .id((int) stockDto.id())
                 .latestPrice(stockDto.latestPrice())
                 .companyName(stockDto.companyName())
                 .symbol(stockDto.symbol())
-                //todo delta
                 .build();
     }
 }
