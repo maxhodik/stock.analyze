@@ -21,10 +21,10 @@ public class GetDataJob {
     public void runCompanyGetDataJob() {
         List<Company> companies = processingService.getCompanies();
         processingService.saveCompanies(companies);
-        processingService.getCompaniesFromDB();
+//        processingService.getCompaniesFromDB();
     }
 
-    //    @Scheduled(fixedDelay = 5000, initialDelay = 3000)
+    @Scheduled(fixedDelay = 5000, initialDelay = 3000)
     public void runStockDataJob() {
         List<Stock> stocks = processingService.getStock();
         processingService.saveStocks(stocks);
