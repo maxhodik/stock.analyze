@@ -9,9 +9,10 @@ import java.util.List;
 public interface ProcessingService {
     List<Company> getCompanies();
 
-    List<Stock> getStock();
+    List<Stock> getStocks();
 
     void saveCompanies(List<Company> companies);
+
 
     void saveStocks(List<Stock> stocks);
 
