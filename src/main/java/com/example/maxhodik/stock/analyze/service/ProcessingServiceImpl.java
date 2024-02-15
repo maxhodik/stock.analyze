@@ -6,6 +6,7 @@ import com.example.maxhodik.stock.analyze.entity.Stock;
 import com.example.maxhodik.stock.analyze.mapper.CompanyMapper;
 import com.example.maxhodik.stock.analyze.mapper.StockMapper;
 import com.example.maxhodik.stock.analyze.repository.CompanyRepository;
+import com.example.maxhodik.stock.analyze.repository.CustomCompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.StockRepository;
 import com.example.maxhodik.stock.analyze.restClient.CompanyClient;
 import com.example.maxhodik.stock.analyze.restClient.StockClient;
@@ -31,6 +32,7 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final CompanyMapper companyMapper;
     private final StockMapper stockMapper;
     private final CompanyRepository companyRepository;
+    private final CustomCompanyRepository customCompanyRepository;
     private final StockRepository stockRepository;
     private List<String> tasks = new ArrayList<>();
 
@@ -39,7 +41,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         return companyClient.getCompanies().stream()
                 .filter(CompanyDto::isEnabled)
                 .limit(200)
-                .peek(System.out::println)
+//                .peek(System.out::println)
                 .map(companyMapper::convertToCompany)
                 .map(this::addTask)
                 .toList();
@@ -61,8 +63,9 @@ public class ProcessingServiceImpl implements ProcessingService {
     @Override
     public void saveCompanies(List<Company> companies) {
         log.info("Start saving companies");
-        Flux<Company> companyFlux = companyRepository.saveAll(companies);
-        companyFlux.subscribe(System.out::println);
+//        Flux<Company> companyFlux = companyRepository.saveAll(companies);
+//        companyFlux.subscribe(System.out::println);
+        customCompanyRepository.saveCompanies(companies);
         log.info("End saving companies");
     }
 
