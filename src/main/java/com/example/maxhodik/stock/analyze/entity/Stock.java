@@ -1,6 +1,9 @@
 package com.example.maxhodik.stock.analyze.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +15,7 @@ import java.math.BigDecimal;
 @Builder
 public class Stock {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "symbol")
     private String symbol;

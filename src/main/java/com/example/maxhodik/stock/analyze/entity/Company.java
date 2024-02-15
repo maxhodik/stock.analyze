@@ -1,44 +1,50 @@
 package com.example.maxhodik.stock.analyze.entity;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
+
 @Data
-@Table(name = "company")
+@Table("company")
 @Builder
-public class Company {
+public class Company implements Persistable<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "symbol")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String symbol;
-    @Column(name = "company_name")
+    @Column("company_name")
     private String companyName;
+    @Transient
+    private Boolean isNew = true;
 
-    public int getId() {
-        return id;
+    @Override
+    public boolean isNew() {
+        return null == getId();
     }
 
-    public void setId(int id) {
-        this.id = id;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Company company = (Company) o;
+
+        if (!id.equals(company.id)) return false;
+        return symbol.equals(company.symbol);
     }
 
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + symbol.hashCode();
+        return result;
     }
 }

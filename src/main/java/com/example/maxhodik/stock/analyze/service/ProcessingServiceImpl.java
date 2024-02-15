@@ -35,9 +35,11 @@ public class ProcessingServiceImpl implements ProcessingService {
     private List<String> tasks = new ArrayList<>();
 
     public List<Company> getCompanies() {
+        log.info("Company dto List");
         return companyClient.getCompanies().stream()
                 .filter(CompanyDto::isEnabled)
                 .limit(200)
+                .peek(System.out::println)
                 .map(companyMapper::convertToCompany)
                 .map(this::addTask)
                 .toList();
@@ -59,7 +61,8 @@ public class ProcessingServiceImpl implements ProcessingService {
     @Override
     public void saveCompanies(List<Company> companies) {
         log.info("Start saving companies");
-        companyRepository.saveAll(companies);
+        Flux<Company> companyFlux = companyRepository.saveAll(companies);
+        companyFlux.subscribe(System.out::println);
         log.info("End saving companies");
     }
 

@@ -20,16 +20,22 @@ public class StockClientImpl implements StockClient {
     private String url;
     private final RestTemplate restTemplate;
 
+
     @Override
     public Optional<StockDto> getStocks(String task) {
         ResponseEntity<StockDto> response = restTemplate.exchange(getUrl(task), HttpMethod.GET, null, StockDto.class);
-        if (response.getStatusCode().is2xxSuccessful() & Objects.nonNull(response.getBody())) {
-            log.debug("Stock is downloaded. Status {}", response.getStatusCode());
-            return Optional.ofNullable(response.getBody());
+        try {
+            if (response.getStatusCode().is2xxSuccessful() & Objects.nonNull(response.getBody())) {
+                log.debug("Stock is downloaded. Status {}", response.getStatusCode());
+                return Optional.ofNullable(response.getBody());
+            }
+        } catch (Exception exception) {
+            log.debug("Status code {}", response.getStatusCode());
+            return Optional.empty();
         }
-        log.debug("Status code {}", response.getStatusCode());
         return Optional.empty();
     }
+
 
     private String getUrl(String task) {
         return String.format(url, task);
