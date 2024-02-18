@@ -1,6 +1,5 @@
 package com.example.maxhodik.stock.analyze.job;
 
-import com.example.maxhodik.stock.analyze.entity.Company;
 import com.example.maxhodik.stock.analyze.entity.Stock;
 import com.example.maxhodik.stock.analyze.service.ProcessingService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,7 @@ public class GetDataJob {
 
     @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 100)
     public void runCompanyGetDataJob() {
-        List<Company> companies = processingService.getCompanies();
-        processingService.saveCompanies(companies);
+         processingService.processingCompanies();
 //        processingService.getCompaniesFromDB();
     }
 

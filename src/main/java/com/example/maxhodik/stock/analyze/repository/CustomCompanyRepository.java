@@ -1,9 +1,8 @@
 package com.example.maxhodik.stock.analyze.repository;
 
 import com.example.maxhodik.stock.analyze.entity.Company;
-
-import java.util.List;
+import reactor.core.publisher.Mono;
 
 public interface CustomCompanyRepository {
- void saveCompanies(List<Company> companies);
+    Mono<Company> saveCompany(Company company);
 }

@@ -1,7 +1,9 @@
 package com.example.maxhodik.stock.analyze.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
@@ -11,7 +13,9 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @Table("company")
-@Builder
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Company implements Persistable<Long> {
 
     @Id
@@ -23,6 +27,11 @@ public class Company implements Persistable<Long> {
     private String companyName;
     @Transient
     private Boolean isNew = true;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
 
     @Override
     public boolean isNew() {

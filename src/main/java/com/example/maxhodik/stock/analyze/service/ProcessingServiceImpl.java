@@ -13,7 +13,9 @@ import com.example.maxhodik.stock.analyze.restClient.StockClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final StockRepository stockRepository;
     private List<String> tasks = new ArrayList<>();
 
-    public List<Company> getCompanies() {
+    public List<Disposable> processingCompanies() {
         log.info("Company dto List");
         return companyClient.getCompanies().stream()
                 .filter(CompanyDto::isEnabled)
@@ -44,7 +46,11 @@ public class ProcessingServiceImpl implements ProcessingService {
 //                .peek(System.out::println)
                 .map(companyMapper::convertToCompany)
                 .map(this::addTask)
+                .map(customCompanyRepository::saveCompany)
+                .map(Mono::subscribe)
                 .toList();
+
+
     }
 
     @Override
@@ -55,19 +61,12 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .map(s -> CompletableFuture.supplyAsync(() -> stockClient.getStocks(s), executorService))
                 .map(completableFuture -> completableFuture.thenApply(Optional::orElseThrow))
                 .map(cf -> cf.thenApply(stockMapper::convertToStock)).toList();
+
         return completableFutures.stream()
                 .map(CompletableFuture::join)
                 .toList();
     }
 
-    @Override
-    public void saveCompanies(List<Company> companies) {
-        log.info("Start saving companies");
-//        Flux<Company> companyFlux = companyRepository.saveAll(companies);
-//        companyFlux.subscribe(System.out::println);
-        customCompanyRepository.saveCompanies(companies);
-        log.info("End saving companies");
-    }
 
     @Override
     public void saveStocks(List<Stock> stocks) {
