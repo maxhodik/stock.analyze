@@ -7,6 +7,7 @@ import com.example.maxhodik.stock.analyze.mapper.CompanyMapper;
 import com.example.maxhodik.stock.analyze.mapper.StockMapper;
 import com.example.maxhodik.stock.analyze.repository.CompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.CustomCompanyRepository;
+import com.example.maxhodik.stock.analyze.repository.CustomStockRepository;
 import com.example.maxhodik.stock.analyze.repository.StockRepository;
 import com.example.maxhodik.stock.analyze.restClient.CompanyClient;
 import com.example.maxhodik.stock.analyze.restClient.StockClient;
@@ -17,10 +18,10 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,15 +36,15 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final StockMapper stockMapper;
     private final CompanyRepository companyRepository;
     private final CustomCompanyRepository customCompanyRepository;
+    private final CustomStockRepository customStockRepository;
     private final StockRepository stockRepository;
-    private List<String> tasks = new ArrayList<>();
+    private final List<String> tasks = new CopyOnWriteArrayList<>();
 
     public List<Disposable> processingCompanies() {
         log.info("Company dto List");
         return companyClient.getCompanies().stream()
                 .filter(CompanyDto::isEnabled)
                 .limit(200)
-//                .peek(System.out::println)
                 .map(companyMapper::convertToCompany)
                 .map(this::addTask)
                 .map(customCompanyRepository::saveCompany)
@@ -54,23 +55,28 @@ public class ProcessingServiceImpl implements ProcessingService {
     }
 
     @Override
-    public List<Stock> getStock() {
+    public List<Stock> getStocks() {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         List<CompletableFuture<Stock>> completableFutures = tasks.stream()
-                .map(s -> CompletableFuture.supplyAsync(() -> stockClient.getStocks(s), executorService))
-                .map(completableFuture -> completableFuture.thenApply(Optional::orElseThrow))
+                .map(s -> CompletableFuture.supplyAsync(() -> stockClient.getStock(s), executorService))
+//                .map(completableFuture -> completableFuture.thenApply(Optional::orElseThrow))
                 .map(cf -> cf.thenApply(stockMapper::convertToStock)).toList();
 
+        log.info("List of Completable Future of Stocks");
         return completableFutures.stream()
                 .map(CompletableFuture::join)
+//                .peek(System.out::println)
                 .toList();
     }
 
 
     @Override
     public void saveStocks(List<Stock> stocks) {
-        stockRepository.saveAll(stocks);
+        stocks.stream()
+                .filter(Objects::nonNull)
+                .forEach(customStockRepository::saveStock);
+//        stockRepository.saveAll(stocks);
     }
 
     @Override

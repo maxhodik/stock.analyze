@@ -1,11 +1,9 @@
 package com.example.maxhodik.stock.analyze.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.domain.Persistable;
 
 import java.math.BigDecimal;
 
@@ -13,10 +11,10 @@ import java.math.BigDecimal;
 @Table(name = "stock")
 @Data
 @Builder
-public class Stock {
+public class Stock implements Persistable<Long> {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @Column(name = "symbol")
     private String symbol;
     @Column(name = "latest_price")
@@ -25,12 +23,19 @@ public class Stock {
     private BigDecimal delta;
     @Column(name = "company_name")
     private String companyName;
+    @Transient
+    private boolean isNew = true;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    @Override
+    public boolean isNew() {
+        return getId() == null;
+    }
+
+    public void setId(Long id) {
         this.id = id;
     }
 
