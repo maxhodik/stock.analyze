@@ -24,7 +24,7 @@ public class GetDataJob {
 //        processingService.getCompaniesFromDB();
     }
 
-//    @Scheduled(fixedDelay = 5000, initialDelay = 3000)
+    @Scheduled(fixedDelay = 5000, initialDelay = 3000)
     public void runStockDataJob() {
         List<Stock> stocks = processingService.getStocks();
         log.info("List of stocks {}", stocks);

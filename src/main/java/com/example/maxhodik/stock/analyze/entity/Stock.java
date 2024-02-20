@@ -1,73 +1,60 @@
 package com.example.maxhodik.stock.analyze.entity;
 
-import jakarta.persistence.*;
+
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.domain.Persistable;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
-@Entity
-@Table(name = "stock")
+
+@Table("stock")
 @Data
 @Builder
-public class Stock implements Persistable<Long> {
+public class Stock {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "symbol")
+    @Column("symbol")
     private String symbol;
-    @Column(name = "latest_price")
+    @Column("latest_price")
     private BigDecimal latestPrice;
-    @Column(name = "delta")
+    @Column("delta")
     private BigDecimal delta;
-    @Column(name = "company_name")
+    @Column("company_name")
     private String companyName;
-    @Transient
-    private boolean isNew = true;
+//    @Transient
+//    private boolean newEntity = true;
 
-    public Long getId() {
-        return id;
+//    @Override
+//    public Long getId() {
+//        return id;
+//    }
+//
+//
+//    @Override
+//    public boolean isNew() {
+//        return null == getId();
+//    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Stock stock = (Stock) o;
+
+        if (!Objects.equals(id, stock.id)) return false;
+        return symbol.equals(stock.symbol);
     }
 
     @Override
-    public boolean isNew() {
-        return getId() == null;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public BigDecimal getLatestPrice() {
-        return latestPrice;
-    }
-
-    public void setLatestPrice(BigDecimal latestPrice) {
-        this.latestPrice = latestPrice;
-    }
-
-    public BigDecimal getDelta() {
-        return delta;
-    }
-
-    public void setDelta(BigDecimal delta) {
-        this.delta = delta;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + symbol.hashCode();
+        return result;
     }
 }

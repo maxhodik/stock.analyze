@@ -10,7 +10,7 @@ import java.util.List;
 public interface ProcessingService {
     List<Disposable> processingCompanies();
 
-    List<Stock> getStock();
+    List<Stock> getStocks();
 
     void saveStocks(List<Stock> stocks);
 

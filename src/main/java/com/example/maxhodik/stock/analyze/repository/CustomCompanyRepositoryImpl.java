@@ -21,6 +21,7 @@ public class CustomCompanyRepositoryImpl implements CustomCompanyRepository {
                 .one()
                 .switchIfEmpty(r2dbcTemplate.insert(company)
                         .doOnSuccess(c -> log.info("Company with symbol {} was inserted", c.getSymbol())));
+
     }
 
 }

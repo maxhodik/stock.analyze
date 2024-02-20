@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @Log4j2
@@ -21,18 +22,19 @@ public class StockClientImpl implements StockClient {
 
 
     @Override
-    public StockDto getStock(String task) {
-        ResponseEntity<StockDto> response = restTemplate.exchange(getUrl(task), HttpMethod.GET, null, StockDto.class);
+    public Optional<StockDto> getStock(String task) {
+        ResponseEntity<StockDto> response;
         try {
+            response = restTemplate.exchange(getUrl(task), HttpMethod.GET, null, StockDto.class);
             if (response.getStatusCode().is2xxSuccessful() & Objects.nonNull(response.getBody())) {
                 log.debug("Stock is downloaded. Status {}", response.getStatusCode());
-                return response.getBody();
+                return Optional.ofNullable(response.getBody());
             }
         } catch (Exception exception) {
-            log.debug("Status code {}", response.getStatusCode());
-            return null;
+            log.info("Status code {}", exception.getLocalizedMessage());
+
         }
-        return null;
+        return Optional.empty();
     }
 
 
