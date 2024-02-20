@@ -34,7 +34,6 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final CompanyClient companyClient;
     private final StockClient stockClient;
     private final CompanyMapper companyMapper;
-    //    private final CompanyMapper1 companyMapper1;
     private final StockMapper stockMapper;
     private final StockMapper1 stockMapper1;
     private final CompanyRepository companyRepository;
@@ -49,7 +48,6 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .filter(CompanyDto::isEnabled)
                 .limit(200)
                 .map(companyMapper::convertToCompany)
-//                .map(companyMapper1::mapToCompanyDto)
                 .map(this::addTask)
                 .map(customCompanyRepository::saveCompany)
                 .map(Mono::subscribe)
@@ -65,20 +63,13 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .map(completableFuture -> completableFuture.thenApply(optional ->
                         optional.orElse(null)))
                 .filter(Objects::nonNull)
-//                .map(cf -> cf.thenApply(stockMapper::convertToStock))
                 .map(cf -> cf.thenApply(stockMapper1::mapToStockDto))
                 .toList();
 
         log.info("List of Completable Future of Stocks");
         return completableFutures.stream()
                 .map(CompletableFuture::join)
-//                .peek(System.out::println)
                 .toList();
-//        return CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture<?>[0]))
-//                .thenApply(v->completableFutures.stream()
-//                        .map(CompletableFuture::join)
-//                        .collect(Collectors.toList()))
-//                .join();
     }
 
 
@@ -90,15 +81,8 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .map(customStockRepository::saveStock)
                 .map(Mono::subscribe)
                 .toList();
-//        stockRepository.saveAll(stocks);
 
 
-//        Flux.fromIterable(stocks)
-//                .filter(Objects::nonNull)
-//                .map(customStockRepository::saveStock)
-//                .log("Try save stock ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-//                .map(Mono::subscribe)
-//                .then();
     }
 
     @Override
