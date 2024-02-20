@@ -13,9 +13,8 @@ DELIMITER $$
 USE `stock_analyze`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `stock_analyze`.`stock_BEFORE_INSERT` BEFORE INSERT ON `stock` FOR EACH ROW
 BEGIN
-    INSERT INTO `stock` (delta) VALUES (NULL);
-    INSERT INTO `stock_audit_log` (symbol, old_price, new_price, dml_type, `timestamp`)
-    VALUES (NEW.symbol, NULL, NEW.latest_price, 'INSERT', NOW());
+       INSERT INTO `stock_audit_log` (symbol, old_price, new_price, dml_type, `timestamp`)
+       VALUES (NEW.symbol, NULL, NEW.latest_price, 'INSERT', NOW());
 END$$
 DELIMITER ;
 
@@ -24,7 +23,7 @@ DELIMITER $$
 USE `stock_analyze`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `stock_analyze`.`stock_BEFORE_UPDATE` BEFORE UPDATE ON `stock` FOR EACH ROW
 BEGIN
-    UPDATE `stock` SET NEW.delta = NEW.latest_price - OLD.latest_price;
+    SET new.delta=(new.latest_price-old.latest_price);
     INSERT INTO `stock_audit_log` (symbol, old_price, new_price, dml_type, `timestamp`)
     VALUES (NEW.symbol, OLD.latest_price, NEW.latest_price, 'UPDATE', NOW());
 >>>>>>> test
