@@ -7,9 +7,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class StockMapper {
 
-    public Stock convertToStock(StockDto stockDto) {
+    public Stock mapToStock(StockDto stockDto) {
+        if (stockDto == null) {
+            return null;
+        }
         return Stock.builder()
-//                .id((int) stockDto.id())
                 .latestPrice(stockDto.latestPrice())
                 .companyName(stockDto.companyName())
                 .symbol(stockDto.symbol())

@@ -25,10 +25,10 @@ public class CustomStockRepositoryImpl implements CustomStockRepository {
                 .one()
                 .flatMap(s -> {
                     if (s == null) {
-                        log.info("Stock {} inserted", stock.getSymbol());
+                        log.debug("Stock {} inserted", stock.getSymbol());
                         return r2dbcTemplate.insert(stock);
                     }
-                    log.info("Stock {} updated", stock.getSymbol());
+                    log.debug("Stock {} updated", stock.getSymbol());
                     s.setLatestPrice(stock.getLatestPrice());
                     return r2dbcTemplate.update(s);
                 });

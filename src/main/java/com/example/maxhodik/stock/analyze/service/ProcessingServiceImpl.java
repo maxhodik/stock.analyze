@@ -5,7 +5,6 @@ import com.example.maxhodik.stock.analyze.entity.Company;
 import com.example.maxhodik.stock.analyze.entity.Stock;
 import com.example.maxhodik.stock.analyze.mapper.CompanyMapper;
 import com.example.maxhodik.stock.analyze.mapper.StockMapper;
-import com.example.maxhodik.stock.analyze.mapper.StockMapper1;
 import com.example.maxhodik.stock.analyze.repository.CompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.CustomCompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.CustomStockRepository;
@@ -35,7 +34,6 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final StockClient stockClient;
     private final CompanyMapper companyMapper;
     private final StockMapper stockMapper;
-    private final StockMapper1 stockMapper1;
     private final CompanyRepository companyRepository;
     private final CustomCompanyRepository customCompanyRepository;
     private final CustomStockRepository customStockRepository;
@@ -43,7 +41,7 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final List<String> tasks = new CopyOnWriteArrayList<>();
 
     public List<Disposable> processingCompanies() {
-        log.info("Company dto List");
+        log.debug("Company dto List");
         return companyClient.getCompanies().stream()
                 .filter(CompanyDto::isEnabled)
                 .limit(200)
@@ -63,7 +61,7 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .map(completableFuture -> completableFuture.thenApply(optional ->
                         optional.orElse(null)))
                 .filter(Objects::nonNull)
-                .map(cf -> cf.thenApply(stockMapper1::mapToStockDto))
+                .map(cf -> cf.thenApply(stockMapper::mapToStock))
                 .toList();
 
         log.info("List of Completable Future of Stocks");
@@ -75,7 +73,7 @@ public class ProcessingServiceImpl implements ProcessingService {
 
     @Override
     public void saveStocks(List<Stock> stocks) {
-        log.info("Try save stock before flux");
+        log.debug("Try save stock before flux");
         List<Disposable> disposables = stocks.stream()
                 .filter(Objects::nonNull)
                 .map(customStockRepository::saveStock)
