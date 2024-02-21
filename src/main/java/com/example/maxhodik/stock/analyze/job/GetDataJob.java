@@ -20,7 +20,7 @@ public class GetDataJob {
 
     @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 100)
     public void runCompanyGetDataJob() {
-         processingService.processingCompanies();
+         processingService.processingCompanies().subscribe();
 //        processingService.getCompaniesFromDB();
     }
 

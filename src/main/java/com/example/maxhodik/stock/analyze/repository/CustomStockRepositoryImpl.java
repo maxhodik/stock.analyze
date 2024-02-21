@@ -27,7 +27,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository {
                     if (s != null) {
                         // Stock already exists, update it
                         BigDecimal delta = s.getLatestPrice().subtract(stock.getLatestPrice());
-                        log.info("Stock symbol {}, Old Price{}, new price{}, delta{}", s.getSymbol(), s.getLatestPrice(), stock.getLatestPrice(), delta);
+                        log.debug("Stock symbol {}, Old Price{}, new price{}, delta{}", s.getSymbol(), s.getLatestPrice(), stock.getLatestPrice(), delta);
                         s.setLatestPrice(stock.getLatestPrice());
                     }
                     return r2dbcTemplate.update(s)

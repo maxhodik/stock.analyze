@@ -40,17 +40,32 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final StockRepository stockRepository;
     private final List<String> tasks = new CopyOnWriteArrayList<>();
 
-    public List<Disposable> processingCompanies() {
-        log.debug("Company dto List");
-        return companyClient.getCompanies().stream()
-                .filter(CompanyDto::isEnabled)
-                .limit(200)
-                .map(companyMapper::mapToCompany)
-                .map(this::addTask)
-                .map(customCompanyRepository::saveCompany)
-                .map(Mono::subscribe)
-                .toList();
+//    public List<Disposable> processingCompanies() {
+//        log.debug("Company dto List");
+//        return companyClient.getCompanies().stream()
+//                .filter(CompanyDto::isEnabled)
+//                .limit(200)
+//                .map(companyMapper::mapToCompany)
+//                .map(this::addTask)
+//                .map(customCompanyRepository::saveCompany)
+//                .map(Mono::subscribe)
+//                .toList();
+//    }
+public Flux<Company> processingCompanies() {
+    log.debug("Company dto List");
+    return Flux.fromIterable(companyClient.getCompanies())
+            .filter(CompanyDto::isEnabled)
+            .take(200)
+            .map(companyMapper::mapToCompany)
+            .map(this::addTask)
+            .flatMap(this::addTaskAndSaveCompany);
+}
+
+    private Mono<Company> addTaskAndSaveCompany(Company company) {
+        return customCompanyRepository.saveCompany(company)
+                .doOnSuccess(savedCompany -> log.info("Stock {} saved", savedCompany.getSymbol()));
     }
+
 
     @Override
     public List<Stock> getStocks() {
