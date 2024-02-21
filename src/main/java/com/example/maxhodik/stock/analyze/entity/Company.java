@@ -19,7 +19,6 @@ import org.springframework.data.relational.core.mapping.Table;
 public class Company implements Persistable<Long> {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String symbol;

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompanyMapper {
 
-    public Company convertToCompany(CompanyDto companyDto) {
+    public Company mapToCompany(CompanyDto companyDto) {
         return Company.builder()
-                .id(companyDto.id())
+//                .id(companyDto.id())
                 .symbol(companyDto.symbol())
                 .companyName(companyDto.name())
                 .build();

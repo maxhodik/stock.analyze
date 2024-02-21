@@ -45,7 +45,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         return companyClient.getCompanies().stream()
                 .filter(CompanyDto::isEnabled)
                 .limit(200)
-                .map(companyMapper::convertToCompany)
+                .map(companyMapper::mapToCompany)
                 .map(this::addTask)
                 .map(customCompanyRepository::saveCompany)
                 .map(Mono::subscribe)

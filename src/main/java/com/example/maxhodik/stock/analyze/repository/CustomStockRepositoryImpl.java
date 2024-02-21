@@ -9,6 +9,8 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+
 @Log4j2
 @Repository
 @RequiredArgsConstructor
@@ -18,20 +20,24 @@ public class CustomStockRepositoryImpl implements CustomStockRepository {
 
     public Mono<Stock> saveStock(Stock stock) {
         log.info("Start saving stocks");
-
-
         return r2dbcTemplate.select(Stock.class)
                 .matching(Query.query(Criteria.where("symbol").is(stock.getSymbol())))
                 .one()
                 .flatMap(s -> {
-                    if (s == null) {
-                        log.debug("Stock {} inserted", stock.getSymbol());
-                        return r2dbcTemplate.insert(stock);
+                    if (s != null) {
+                        // Stock already exists, update it
+                        BigDecimal delta = s.getLatestPrice().subtract(stock.getLatestPrice());
+                        log.info("Stock symbol {}, Old Price{}, new price{}, delta{}", s.getSymbol(), s.getLatestPrice(), stock.getLatestPrice(), delta);
+                        s.setLatestPrice(stock.getLatestPrice());
                     }
-                    log.debug("Stock {} updated", stock.getSymbol());
-                    s.setLatestPrice(stock.getLatestPrice());
-                    return r2dbcTemplate.update(s);
-                });
-
+                    return r2dbcTemplate.update(s)
+                            .doOnSuccess(updatedStock -> log.info("Stock {} updated", updatedStock.getSymbol()));
+                })
+                .switchIfEmpty(r2dbcTemplate.insert(stock)
+                        .doOnSuccess(newStock -> log.info("Stock {} inserted", newStock.getSymbol()))
+                        .then(Mono.just(stock)));
     }
 }
+
+
+
