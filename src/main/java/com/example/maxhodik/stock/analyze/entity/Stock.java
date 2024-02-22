@@ -1,6 +1,7 @@
 package com.example.maxhodik.stock.analyze.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Table("stock")
 @Data
 @Builder
+@AllArgsConstructor
 public class Stock {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)

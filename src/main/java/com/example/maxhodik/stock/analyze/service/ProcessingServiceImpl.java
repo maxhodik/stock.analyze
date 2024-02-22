@@ -14,7 +14,6 @@ import com.example.maxhodik.stock.analyze.restClient.StockClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -40,30 +39,19 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final StockRepository stockRepository;
     private final List<String> tasks = new CopyOnWriteArrayList<>();
 
-//    public List<Disposable> processingCompanies() {
-//        log.debug("Company dto List");
-//        return companyClient.getCompanies().stream()
-//                .filter(CompanyDto::isEnabled)
-//                .limit(200)
-//                .map(companyMapper::mapToCompany)
-//                .map(this::addTask)
-//                .map(customCompanyRepository::saveCompany)
-//                .map(Mono::subscribe)
-//                .toList();
-//    }
-public Flux<Company> processingCompanies() {
-    log.debug("Company dto List");
-    return Flux.fromIterable(companyClient.getCompanies())
-            .filter(CompanyDto::isEnabled)
-            .take(200)
-            .map(companyMapper::mapToCompany)
-            .map(this::addTask)
-            .flatMap(this::addTaskAndSaveCompany);
-}
+    public Flux<Company> processingCompanies() {
+        log.debug("Company dto List");
+        return Flux.fromIterable(companyClient.getCompanies())
+                .filter(CompanyDto::isEnabled)
+                .take(200)
+                .map(companyMapper::mapToCompany)
+                .map(this::addTask)
+                .flatMap(this::addTaskAndSaveCompany);
+    }
 
     private Mono<Company> addTaskAndSaveCompany(Company company) {
         return customCompanyRepository.saveCompany(company)
-                .doOnSuccess(savedCompany -> log.info("Stock {} saved", savedCompany.getSymbol()));
+                .doOnSuccess(savedCompany -> log.info("Company {} saved", savedCompany.getSymbol()));
     }
 
 
@@ -87,14 +75,18 @@ public Flux<Company> processingCompanies() {
 
 
     @Override
-    public void saveStocks(List<Stock> stocks) {
+    public Mono<Void> saveStocks(List<Stock> stocks) {
         log.debug("Try save stock before flux");
-        List<Disposable> disposables = stocks.stream()
+//        List<Disposable> disposables = stocks.stream()
+//                .filter(Objects::nonNull)
+//                .map(customStockRepository::saveStock)
+//                .map(Mono::subscribe)
+//                .toList();
+        return Flux.fromIterable(stocks)
                 .filter(Objects::nonNull)
                 .map(customStockRepository::saveStock)
                 .map(Mono::subscribe)
-                .toList();
-
+                .then();
 
     }
 
