@@ -28,6 +28,9 @@ public class Stock {
     private BigDecimal delta;
     @Column("company_name")
     private String companyName;
+
+    public Stock() {
+    }
 //    @Transient
 //    private boolean newEntity = true;
 

@@ -17,23 +17,20 @@ import java.math.BigDecimal;
 public class CustomStockRepositoryImpl implements CustomStockRepository {
     private final R2dbcEntityTemplate r2dbcTemplate;
 
-
     public Mono<Stock> saveStock(Stock stock) {
-        log.info("Start saving stocks");
+        log.debug("Start saving stock");
         return r2dbcTemplate.select(Stock.class)
                 .matching(Query.query(Criteria.where("symbol").is(stock.getSymbol())))
                 .one()
                 .flatMap(s -> {
-                    if (s != null) {
-                        // Stock already exists, update it
-                        BigDecimal delta = s.getLatestPrice().subtract(stock.getLatestPrice());
-                        log.debug("Stock symbol {}, Old Price{}, new price{}, delta{}", s.getSymbol(), s.getLatestPrice(), stock.getLatestPrice(), delta);
-                        s.setLatestPrice(stock.getLatestPrice());
-                    }
+                    BigDecimal delta = s.getLatestPrice().subtract(stock.getLatestPrice());
+                    log.debug("Stock symbol {}, Old Price{}, new price{}, delta{}", s.getSymbol(), s.getLatestPrice(), stock.getLatestPrice(), delta);
+                    s.setLatestPrice(stock.getLatestPrice());
                     return r2dbcTemplate.update(s)
-                            .doOnSuccess(updatedStock -> log.info("Stock {} updated", updatedStock.getSymbol()));
+                            .doOnSuccess(updatedStock -> log.info("Stock {} updated", updatedStock.getSymbol()))
+                            .then(Mono.just(s));
                 })
-                .switchIfEmpty(r2dbcTemplate.insert(stock)
+                .switchIfEmpty(Mono.defer(() -> r2dbcTemplate.insert(stock))
                         .doOnSuccess(newStock -> log.info("Stock {} inserted", newStock.getSymbol()))
                         .then(Mono.just(stock)));
     }

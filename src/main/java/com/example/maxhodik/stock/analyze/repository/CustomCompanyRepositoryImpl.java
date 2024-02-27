@@ -19,8 +19,9 @@ public class CustomCompanyRepositoryImpl implements CustomCompanyRepository {
         return r2dbcTemplate.select(Company.class)
                 .matching(Query.query(Criteria.where("symbol").is(company.getSymbol())))
                 .one()
-                .switchIfEmpty(r2dbcTemplate.insert(company)
-                        .doOnSuccess(c -> log.info("Company with symbol {} was inserted", c.getSymbol())));
+                .switchIfEmpty(Mono.defer(() -> r2dbcTemplate.insert(company)))
+                .doOnSuccess(c -> log.info("Company with symbol {} was inserted", c.getSymbol()))
+                .doOnError(e -> log.info("Company with symbol doesn't inserted  {}", e.getMessage()));
 
     }
 

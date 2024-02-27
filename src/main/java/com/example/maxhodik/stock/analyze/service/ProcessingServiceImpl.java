@@ -1,5 +1,6 @@
 package com.example.maxhodik.stock.analyze.service;
 
+import com.example.maxhodik.stock.analyze.config.Config;
 import com.example.maxhodik.stock.analyze.dto.CompanyDto;
 import com.example.maxhodik.stock.analyze.entity.Company;
 import com.example.maxhodik.stock.analyze.entity.Stock;
@@ -8,7 +9,6 @@ import com.example.maxhodik.stock.analyze.mapper.StockMapper;
 import com.example.maxhodik.stock.analyze.repository.CompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.CustomCompanyRepository;
 import com.example.maxhodik.stock.analyze.repository.CustomStockRepository;
-import com.example.maxhodik.stock.analyze.repository.StockRepository;
 import com.example.maxhodik.stock.analyze.restClient.CompanyClient;
 import com.example.maxhodik.stock.analyze.restClient.StockClient;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,8 @@ import java.util.concurrent.Executors;
 @Log4j2
 @RequiredArgsConstructor
 public class ProcessingServiceImpl implements ProcessingService {
+
+    private final Config config;
     private final CompanyClient companyClient;
     private final StockClient stockClient;
     private final CompanyMapper companyMapper;
@@ -36,14 +38,13 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final CompanyRepository companyRepository;
     private final CustomCompanyRepository customCompanyRepository;
     private final CustomStockRepository customStockRepository;
-    private final StockRepository stockRepository;
     private final List<String> tasks = new CopyOnWriteArrayList<>();
 
     public Flux<Company> processingCompanies() {
         log.debug("Company dto List");
         return Flux.fromIterable(companyClient.getCompanies())
                 .filter(CompanyDto::isEnabled)
-                .take(200)
+                .take(config.getNumberOfCompaniesConfig())
                 .map(companyMapper::mapToCompany)
                 .map(this::addTask)
                 .flatMap(this::addTaskAndSaveCompany);
@@ -51,7 +52,7 @@ public class ProcessingServiceImpl implements ProcessingService {
 
     private Mono<Company> addTaskAndSaveCompany(Company company) {
         return customCompanyRepository.saveCompany(company)
-                .doOnSuccess(savedCompany -> log.info("Company {} saved", savedCompany.getSymbol()));
+                .doOnSuccess(savedCompany -> log.info("Company {} processed", savedCompany.getSymbol()));
     }
 
 

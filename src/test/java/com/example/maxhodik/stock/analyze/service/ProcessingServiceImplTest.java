@@ -1,5 +1,6 @@
 package com.example.maxhodik.stock.analyze.service;
 
+import com.example.maxhodik.stock.analyze.config.Config;
 import com.example.maxhodik.stock.analyze.dto.CompanyDto;
 import com.example.maxhodik.stock.analyze.dto.StockDto;
 import com.example.maxhodik.stock.analyze.entity.Company;
@@ -35,14 +36,16 @@ class ProcessingServiceImplTest {
     private static final List<String> TASKS = List.of("symbol");
     private final Company EXPECTED_COMPANY = new Company(1L, "symbol", "companyName", true);
     private final CompanyDto EXPECTED_COMPANY_DTO = new CompanyDto("symbol", "companyName", true);
-    private final List<Company> COMPANIES_LIST = List.of(EXPECTED_COMPANY);
     private final List<CompanyDto> COMPANIES_DTO_LIST = List.of(EXPECTED_COMPANY_DTO);
     private final Stock EXPECTED_STOCK = new Stock(null, "symbol", BigDecimal.TEN, null, "companyName");
     private final StockDto EXPECTED_STOCK_DTO = new StockDto(BigDecimal.TEN, "companyName", "symbol");
     private final List<Stock> EXPECTED_STOCKS_LIST = List.of(EXPECTED_STOCK);
-    private final List<StockDto> EXPECTED_STOCKS_GTO_LIST = List.of(EXPECTED_STOCK_DTO);
+
+    private final Integer NUMBER_OF_COMPANIES = 10;
     @Mock
     private CompanyClient companyClient;
+    @Mock
+    private Config config;
     @Mock
     private StockClient stockClient;
     @Mock
@@ -53,6 +56,7 @@ class ProcessingServiceImplTest {
     private CustomCompanyRepository customCompanyRepository;
     @Mock
     private CustomStockRepository customStockRepository;
+
     @InjectMocks
     private ProcessingServiceImpl processingService;
 
@@ -62,6 +66,7 @@ class ProcessingServiceImplTest {
     @Test
     void processingCompanies() {
         //Given
+        when(config.getNumberOfCompaniesConfig()).thenReturn(NUMBER_OF_COMPANIES);
         when(companyClient.getCompanies()).thenReturn(COMPANIES_DTO_LIST);
         when(companyMapper.mapToCompany(EXPECTED_COMPANY_DTO)).thenReturn(EXPECTED_COMPANY);
         when(customCompanyRepository.saveCompany(any(Company.class))).thenReturn(Mono.just(EXPECTED_COMPANY));
